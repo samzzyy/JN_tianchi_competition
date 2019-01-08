@@ -61,6 +61,12 @@ from sklearn import preprocessing
 from sklearn.svm import SVR
 
 df_train=pd.read_csv("E:\\jinnan\\train_after_clean.csv")
+df_train=df_train[df_train['yeild_rate']>=0.87]
+df_train.drop(['B3', 'B13', 'A13', 'A18', 'A23'], axis=1, inplace=True)
+for col in df_train.columns:
+    rate = df_train[col].value_counts(normalize=True, dropna=False).values[0]
+    if rate > 0.9:
+        df_train.drop(columns=[col], axis=1, inplace=True)
 print(df_train.columns,df_train.shape)
 label_array=df_train["yeild_rate"].values
 df_train=df_train.drop(columns=['id','yeild_rate'])
@@ -74,6 +80,12 @@ clf.fit(train_array, label_array)
 print("fit finished")
 
 df_test=pd.read_csv("E:\\jinnan\\test_after_clean.csv")
+df_test.drop(['B3', 'B13', 'A13', 'A18', 'A23'], axis=1, inplace=True)
+for col in df_test.columns:
+    rate = df_test[col].value_counts(normalize=True, dropna=False).values[0]
+    if rate > 0.9:
+        df_test.drop(columns=[col], axis=1, inplace=True)
+print(df_test.columns,df_test.shape)
 columns_list=list(df_test.columns)
 columns_list.remove("id")
 test_array=df_test[columns_list].values
@@ -85,7 +97,7 @@ y_predicted=clf.predict(test_array)
 df_predicted=pd.DataFrame({"id":df_test["id"].values,"predicted":y_predicted})
 df_predicted.loc[:,"predicted"]=df_predicted["predicted"].apply(lambda x: round(x,3))
 df_predicted.to_csv("E:\\jinnan\\predict_result\\jinnan_round1_submit_20181227.csv",header=None,index=False)
-
+print(df_predicted)
 plt_plot(y_predicted)
 
 

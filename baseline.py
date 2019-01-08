@@ -54,14 +54,21 @@ from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 
 df_train=pd.read_csv("E:\\jinnan\\train_after_clean.csv")
+df_train=df_train[df_train['yeild_rate']>0.87]
+df_train.drop(['B3', 'B13', 'A13', 'A18', 'A23'], axis=1, inplace=True)
+for col in df_train.columns:
+    rate = df_train[col].value_counts(normalize=True, dropna=False).values[0]
+    if rate > 0.9:
+        df_train.drop(columns=[col], axis=1, inplace=True)
 print(df_train.columns,df_train.shape)
+
 label_array=df_train["yeild_rate"].values
-df_train=df_train.drop(columns=['id','yeild_rate'])
+df_train.drop(columns=['id','yeild_rate'],axis=1,inplace=True)
 train_array=df_train.values
 min_max_scaler = preprocessing.MinMaxScaler()
 train_array = min_max_scaler.fit_transform(train_array)
 
-X_train, X_test, y_train, y_test = train_test_split(train_array, label_array, test_size=0.1, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(train_array, label_array, test_size=0.1, random_state=4)
 
 clf=SVR()
 print(clf)
@@ -69,6 +76,7 @@ clf.fit(X_train, y_train)
 print("fit finished")
 
 y_predicted=clf.predict(X_test)
-
+df_predicted=pd.DataFrame({"predicted":y_predicted,"real":y_test})
+print(df_predicted)
 error=np.mean(np.sum((y_predicted-y_test)**2))
 print(error)
