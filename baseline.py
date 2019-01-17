@@ -5,7 +5,8 @@ def hms2s(t):
     # print(t)
     h,m,s = t.strip().split(":")
     # print(h, m,s)
-    return int(h) * 3600 + int(m) * 60 + int(s)
+    # return int(h) * 3600 + int(m) * 60 + int(s)
+    return int(h) * 60 + int(m)
 def hm2m(t):
     # print(t)
     h, m = t.strip().split(":")
@@ -17,7 +18,7 @@ def train_data_clean():
            'A11', 'A12', 'A13', 'A14', 'A15', 'A16', 'A17', 'A18', 'A19', 'A20',
            'A21', 'A22', 'A23', 'A24', 'A25', 'A26', 'A27', 'A28', 'B1', 'B2',
            'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'B12', 'B13',
-           'B14', 'yeild_rate'],encoding = 'gb18030')
+           'B14', 'yield_rate'],encoding = 'gb18030')
     hms_list=["B7","A16","A14","A11","A9","A5"]
     hms_hms_list=["B9","B4","A20","A28"]
 
@@ -47,14 +48,16 @@ def train_data_clean():
         df_train[hms_hms_column+"range"] = df_train[hms_hms_column].apply(lambda x: hm2m(x.strip().split('-')[1])-hm2m(x.strip().split('-')[0]))
         df_train[hms_hms_column]=df_train[hms_hms_column].apply(lambda x: hm2m(x.strip().split('-')[0]))
 
-    # df_train.to_csv("E:\\jinnan\\train_after_clean.csv",index=False)
-# train_data_clean()
+    df_train.to_csv("E:\\jinnan\\train_after_clean.csv",index=False)
+train_data_clean()
+exit()
+
 from sklearn import preprocessing
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 
 df_train=pd.read_csv("E:\\jinnan\\train_after_clean.csv")
-df_train=df_train[df_train['yeild_rate']>0.87]
+df_train=df_train[df_train['yield_rate']>0.87]
 df_train.drop(['B3', 'B13', 'A13', 'A18', 'A23'], axis=1, inplace=True)
 for col in df_train.columns:
     rate = df_train[col].value_counts(normalize=True, dropna=False).values[0]
@@ -62,8 +65,8 @@ for col in df_train.columns:
         df_train.drop(columns=[col], axis=1, inplace=True)
 print(df_train.columns,df_train.shape)
 
-label_array=df_train["yeild_rate"].values
-df_train.drop(columns=['id','yeild_rate'],axis=1,inplace=True)
+label_array=df_train["yield_rate"].values
+df_train.drop(columns=['id','yield_rate'],axis=1,inplace=True)
 train_array=df_train.values
 min_max_scaler = preprocessing.MinMaxScaler()
 train_array = min_max_scaler.fit_transform(train_array)

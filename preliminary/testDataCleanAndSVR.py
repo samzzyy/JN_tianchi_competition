@@ -11,7 +11,8 @@ def hms2s(t):
     # print(t)
     h,m,s = t.strip().split(":")
     # print(h, m,s)
-    return int(h) * 3600 + int(m) * 60 + int(s)
+    # return int(h) * 3600 + int(m) * 60 + int(s)
+    return int(h) * 60 + int(m)
 def hm2m(t):
     # print(t)
     h, m = t.strip().split(":")
@@ -56,20 +57,21 @@ def data_clean():
     df_temp.to_csv("E:\\jinnan\\test_after_clean.csv",index=False)
 
 # data_clean()
+# exit()
 
 from sklearn import preprocessing
 from sklearn.svm import SVR
 
 df_train=pd.read_csv("E:\\jinnan\\train_after_clean.csv")
-df_train=df_train[df_train['yeild_rate']>=0.87]
+df_train=df_train[df_train['yield_rate']>=0.87]
 df_train.drop(['B3', 'B13', 'A13', 'A18', 'A23'], axis=1, inplace=True)
 for col in df_train.columns:
     rate = df_train[col].value_counts(normalize=True, dropna=False).values[0]
     if rate > 0.9:
         df_train.drop(columns=[col], axis=1, inplace=True)
 print(df_train.columns,df_train.shape)
-label_array=df_train["yeild_rate"].values
-df_train=df_train.drop(columns=['id','yeild_rate'])
+label_array=df_train["yield_rate"].values
+df_train=df_train.drop(columns=['id','yield_rate'])
 train_array=df_train.values
 min_max_scaler = preprocessing.MinMaxScaler()
 train_array = min_max_scaler.fit_transform(train_array)
